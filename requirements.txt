@@ -1,0 +1,8 @@
+scikit-learn
+pandas
+numpy
+seaborn
+matplotlib
+fastparquet
+pyarrow
+dill
