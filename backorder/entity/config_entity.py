@@ -8,10 +8,10 @@ class TrainingPipelineConfig:
     def __init__(self):
         self.root = Path.cwd()
         self.artifact_dir = Path('artifacts', dt.now().strftime('%m%d%y__%H'))
-        self._create_all_dirs()
+        self.__create_all_dirs()
 
-    def _create_all_dirs(self):
-        self.artifact_dir.mkdir(exist_ok=True)
+    def __create_all_dirs(self):
+        self.artifact_dir.mkdir(parents=True, exist_ok=True)
 
 
 class DataIngestionConfig(TrainingPipelineConfig):
@@ -23,13 +23,13 @@ class DataIngestionConfig(TrainingPipelineConfig):
         self.train_path = self.dir / 'dataset' / 'train.parquet'
         self.test_path = self.dir / 'dataset' / 'test.parquet'
         self.test_size = 0.2
-        self._create_all_dirs()
+        self.__create_all_dirs()
 
     def to_dict(self) -> dict:
         """ Convert data into dict """
         return self.__dict__
 
-    def _create_all_dirs(self):
+    def __create_all_dirs(self):
         self.dir.mkdir(parents=True, exist_ok=True)
         self.feature_store_fp.parent.mkdir(exist_ok=True)
         self.train_path.parent.mkdir(exist_ok=True)
@@ -42,9 +42,9 @@ class DataValidationConfig(DataIngestionConfig):
         self.dir = self.artifact_dir / 'data_validation'
         self.report_fp = self.dir / 'report.yaml'
         self.missing_threshold = 0.2
-        self._create_all_dirs()
+        self.__create_all_dirs()
 
-    def _create_all_dirs(self):
+    def __create_all_dirs(self):
         self.dir.mkdir(exist_ok=True)
 
 
@@ -56,9 +56,9 @@ class DataTransformationConfig(DataIngestionConfig):
         self.target_enc_fp = self.dir / 'target_encoder.pkl'
         self.train_npz_path = self.dir / 'transformed' / 'train.npz'
         self.test_npz_path = self.dir / 'transformed' / 'test.npz'
-        self._create_all_dirs()
+        self.__create_all_dirs()
 
-    def _create_all_dirs(self):
+    def __create_all_dirs(self):
         self.dir.mkdir(exist_ok=True)
         self.train_npz_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -70,9 +70,9 @@ class ModelTrainerConfig(TrainingPipelineConfig):
         self.model_path = self.dir / 'model.pkl'
         self.expected_score = 0.7
         self.overfitting_threshold = 0.3
-        self._create_all_dirs()
+        self.__create_all_dirs()
 
-    def _create_all_dirs(self):
+    def __create_all_dirs(self):
         self.dir.mkdir(exist_ok=True)
 
 
@@ -91,8 +91,8 @@ class ModelPusherConfig(TrainingPipelineConfig):
         self.target_enc_path = self.dir / 'target_encoder.pkl'
         # Store the latest models and datasets at root directory
         self.root_saved_model_dir = self.root / 'saved_models'
-        self._create_all_dirs()
+        self.__create_all_dirs()
 
-    def _create_all_dirs(self):
+    def __create_all_dirs(self):
         self.dir.mkdir(exist_ok=True)
         self.root_saved_model_dir.mkdir(exist_ok=True)
