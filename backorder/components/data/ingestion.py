@@ -1,8 +1,6 @@
 """ Divides data for pipeline. """
 
 from pathlib import Path
-from sys import exc_info
-from typing import Literal
 
 from pandas import DataFrame
 from sklearn.model_selection import train_test_split
@@ -10,10 +8,10 @@ from sklearn.model_selection import train_test_split
 from backorder import utils
 from backorder.entity.artifact_entity import DataIngestionArtifact
 from backorder.entity.config_entity import DataIngestionConfig
-from backorder.exception import CustomException
 from backorder.logger import logging
 
 
+@utils.wrap_with_custom_exception
 class DataIngestion(DataIngestionConfig):
     def __init__(self):
         """ Divides and store the main data into train, test and validation data. """
@@ -54,20 +52,17 @@ class DataIngestion(DataIngestionConfig):
 
     def initiate(self, main_data_fp: Path | None = None) -> DataIngestionArtifact:
         """ Initiate the Data Ingestion process. """
-        try:
-            df = self._import_data(main_data_fp)
-            # df = self._clean_df(df)
-            train_df, test_df = self._split(df)
+        df = self._import_data(main_data_fp)
+        # df = self._clean_df(df)
+        train_df, test_df = self._split(df)
 
-            # Save train and test df
-            self._df_to_parquet(train_df, self.train_path)
-            self._df_to_parquet(test_df, self.test_path)
+        # Save train and test df
+        self._df_to_parquet(train_df, self.train_path)
+        self._df_to_parquet(test_df, self.test_path)
 
-            # Prepare artifact
-            artifact = DataIngestionArtifact(
-                self.feature_store_fp, self.train_path, self.test_path
-            )
-            logging.info(f"Data ingestion artifact: {artifact}")
-            return artifact
-        except Exception as e:
-            raise CustomException(e, exc_info())
+        # Prepare artifact
+        artifact = DataIngestionArtifact(
+            self.feature_store_fp, self.train_path, self.test_path
+        )
+        logging.info(f"Data ingestion artifact: {artifact}")
+        return artifact

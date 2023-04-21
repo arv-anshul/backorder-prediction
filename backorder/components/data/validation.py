@@ -9,6 +9,7 @@ from backorder.entity.config_entity import DataValidationConfig
 from backorder.logger import logging
 
 
+@utils.wrap_with_custom_exception
 class DataValidation(DataValidationConfig):
     def __init__(self):
         """

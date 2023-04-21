@@ -14,6 +14,37 @@ from backorder.exception import CustomException
 from backorder.logger import logging
 
 
+def exception_wrapper(func):
+    """
+    Wraps function in a try-except block and raises a custom exception if an exception is caught.
+    """
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            raise CustomException(e, exc_info())
+    return wrapper
+
+
+def wrap_with_custom_exception(cls):
+    """
+    Wraps all methods of a class in a try-except block and raises a custom exception.
+    """
+    def wrapper(method):
+        def wrapped(*args, **kwargs):
+            try:
+                return method(*args, **kwargs)
+            except Exception as e:
+                raise CustomException(e, exc_info())
+        return wrapped
+
+    for name, method in vars(cls).items():
+        if callable(method):
+            setattr(cls, name, wrapper(method))
+    return cls
+
+
+@exception_wrapper
 def read_dataset(fp: Path) -> DataFrame:
     """ Mostly supports `csv` and `parquet`. """
     # Extract pandas attribute from file extension
@@ -30,6 +61,7 @@ def read_dataset(fp: Path) -> DataFrame:
     return df
 
 
+@exception_wrapper
 def to_yaml(fp: Path, data: dict):
     """ Function for Data Validation process. """
     fp.parent.mkdir(exist_ok=True)
@@ -38,6 +70,7 @@ def to_yaml(fp: Path, data: dict):
         yaml.dump(data, f)
 
 
+@exception_wrapper
 def dump_object(fp: Path, obj: object) -> None:
     """ Function for Data Transformation process. """
     try:
@@ -49,6 +82,7 @@ def dump_object(fp: Path, obj: object) -> None:
         raise CustomException(e, exc_info()) from e
 
 
+@exception_wrapper
 def load_object(fp: Path) -> object:
     """ Function for Data Transformation process. """
     try:
@@ -60,11 +94,13 @@ def load_object(fp: Path) -> object:
         raise CustomException(e, exc_info()) from e
 
 
+@exception_wrapper
 def dump_array(fp: Path, array):
     with open(fp, "wb") as f:
         np.save(f, array)
 
 
+@exception_wrapper
 def load_array(fp: Path):
     with open(fp, "rb") as f:
         return np.load(f)
