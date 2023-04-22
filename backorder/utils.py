@@ -83,7 +83,7 @@ def dump_object(fp: Path, obj: object) -> None:
 
 
 @exception_wrapper
-def load_object(fp: Path) -> object:
+def load_object(fp: Path):
     """ Function for Data Transformation process. """
     try:
         if not fp.exists():

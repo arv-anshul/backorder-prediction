@@ -1,7 +1,7 @@
 from datetime import datetime as dt
 from pathlib import Path
 
-from backorder.config import BASE_DATA_NAME
+from backorder.config import BASE_DATA_NAME, STORED_MODEL_PATH
 
 
 class TrainingPipelineConfig:
@@ -90,9 +90,9 @@ class ModelPusherConfig(TrainingPipelineConfig):
         self.transformer_path = self.dir / 'transformer.pkl'
         self.target_enc_path = self.dir / 'target_encoder.pkl'
         # Store the latest models and datasets at root directory
-        self.root_saved_model_dir = self.root / 'saved_models'
+        self.root_stored_model_dir = STORED_MODEL_PATH
         self.__create_all_dirs()
 
     def __create_all_dirs(self):
         self.dir.mkdir(exist_ok=True)
-        self.root_saved_model_dir.mkdir(exist_ok=True)
+        self.root_stored_model_dir.mkdir(exist_ok=True)
