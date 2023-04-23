@@ -3,6 +3,8 @@
 from types import TracebackType
 from typing import TypeAlias
 
+from backorder.logger import logging
+
 ExcInfo: TypeAlias = tuple[type[BaseException], BaseException, TracebackType]
 OptExcInfo: TypeAlias = ExcInfo | tuple[None, None, None]
 
@@ -10,7 +12,7 @@ OptExcInfo: TypeAlias = ExcInfo | tuple[None, None, None]
 class CustomException(Exception):
     def __init__(
         self,
-        error_message: Exception,
+        error_message: Exception | str,
         error_detail: OptExcInfo,
     ) -> None:
         super().__init__(error_message)
@@ -19,7 +21,7 @@ class CustomException(Exception):
 
     @staticmethod
     def error_message_detail(
-        error: Exception,
+        error: Exception | str,
         error_detail: OptExcInfo,
     ) -> str:
         """
@@ -31,9 +33,10 @@ class CustomException(Exception):
             # Extracting file name from exception traceback
             file_name = exc_tb.tb_frame.f_code.co_filename
             # Preparing error message
-            message = f"Error: '{file_name}'[{exc_tb.tb_lineno}]: {error}"
+            message = f'"{file_name}":[{exc_tb.tb_lineno}] - {error}'
         else:
             message = 'No error details available for the raised exception.'
+        logging.error(message)
         return message
 
     def __str__(self) -> str:

@@ -4,6 +4,7 @@ from pathlib import Path
 
 from backorder import utils
 from backorder.config import STORED_MODEL_PATH
+from backorder.logger import logging
 
 
 @utils.wrap_with_custom_exception
@@ -30,19 +31,25 @@ class StoredModelConfig:
     @property
     def stored_model_path(self):
         if self.latest_stored_dir is None:
-            raise Exception('Model is not available.')
+            error_msg = 'Model is not available.'
+            logging.error(error_msg)
+            raise FileNotFoundError(error_msg)
         return self.latest_stored_dir / 'model.pkl'
 
     @property
     def stored_transformer_path(self):
         if self.latest_stored_dir is None:
-            raise Exception('Transformer is not available.')
+            error_msg = 'Transformer is not available.'
+            logging.error(error_msg)
+            raise FileNotFoundError(error_msg)
         return self.latest_stored_dir / 'transformer.pkl'
 
     @property
     def stored_target_enc_path(self):
         if self.latest_stored_dir is None:
-            raise Exception('Target encoder is not available.')
+            error_msg = 'Target encoder is not available.'
+            logging.error(error_msg)
+            raise FileNotFoundError(error_msg)
         return self.latest_stored_dir / 'target_encoder.pkl'
 
     @property
