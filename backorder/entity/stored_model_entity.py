@@ -10,13 +10,10 @@ from backorder.config import STORED_MODEL_PATH
 class StoredModelConfig:
     def __init__(self) -> None:
         self.model_registry = STORED_MODEL_PATH
-        self.__create_all_dirs()
+        self.model_registry.mkdir(exist_ok=True)
 
         self.latest_stored_dir = self.__get_latest_stored_dir_path()
         self.new_dir_to_store_models = self.__get_new_dir_path_to_store()
-
-    def __create_all_dirs(self):
-        self.model_registry.mkdir(exist_ok=True)
 
     def __get_latest_stored_dir_path(self) -> Path | None:
         dir_names = [int(i.name) for i in self.model_registry.iterdir()]

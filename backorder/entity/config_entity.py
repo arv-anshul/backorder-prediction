@@ -95,4 +95,3 @@ class ModelPusherConfig(TrainingPipelineConfig):
 
     def __create_all_dirs(self):
         self.dir.mkdir(exist_ok=True)
-        self.root_stored_model_dir.mkdir(exist_ok=True)

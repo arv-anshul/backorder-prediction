@@ -75,6 +75,7 @@ def dump_object(fp: Path, obj: object) -> None:
     """ Function for Data Transformation process. """
     try:
         logging.info('Enter in the save_object function of utils.')
+        fp.parent.mkdir(parents=True, exist_ok=True)
         with open(fp, 'wb') as f:
             dill.dump(obj, f)
         logging.info('Exit from save_object function of utils.')
