@@ -7,8 +7,8 @@ from sklearn.preprocessing import LabelEncoder, RobustScaler
 
 from backorder import utils
 from backorder.config import TARGET_COLUMN
-from backorder.entity.artifact_entity import DataTransformationArtifact
-from backorder.entity.config_entity import DataTransformationConfig
+from backorder.entity import (DataTransformationArtifact,
+                              DataTransformationConfig)
 from backorder.logger import logging
 
 

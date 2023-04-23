@@ -1,11 +1,9 @@
 """ Model Pusher """
 
 from backorder import utils
-from backorder.entity.artifact_entity import (DataTransformationArtifact,
-                                              ModelPusherArtifact,
-                                              ModelTrainerArtifact)
-from backorder.entity.config_entity import ModelPusherConfig
-from backorder.entity.stored_model_entity import StoredModelConfig
+from backorder.entity import (DataTransformationArtifact, ModelPusherArtifact,
+                              ModelPusherConfig, ModelTrainerArtifact,
+                              StoredModelConfig)
 from backorder.logger import logging
 
 

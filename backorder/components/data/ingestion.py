@@ -6,8 +6,7 @@ from pandas import DataFrame
 from sklearn.model_selection import train_test_split
 
 from backorder import utils
-from backorder.entity.artifact_entity import DataIngestionArtifact
-from backorder.entity.config_entity import DataIngestionConfig
+from backorder.entity import DataIngestionArtifact, DataIngestionConfig
 from backorder.logger import logging
 
 

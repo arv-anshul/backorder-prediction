@@ -6,9 +6,8 @@ from sklearn.svm import SVR
 
 from backorder import utils
 from backorder.config import PREDICTION_TYPE
-from backorder.entity.artifact_entity import ModelTrainerArtifact
-from backorder.entity.config_entity import (DataTransformationConfig,
-                                            ModelTrainerConfig)
+from backorder.entity import (DataTransformationConfig, ModelTrainerArtifact,
+                              ModelTrainerConfig)
 from backorder.logger import logging
 
 

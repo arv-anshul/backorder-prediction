@@ -4,8 +4,7 @@ from pandas import DataFrame
 from scipy.stats import ks_2samp
 
 from backorder import utils
-from backorder.entity.artifact_entity import DataValidationArtifact
-from backorder.entity.config_entity import DataValidationConfig
+from backorder.entity import DataValidationArtifact, DataValidationConfig
 from backorder.logger import logging
 
 

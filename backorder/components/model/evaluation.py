@@ -4,12 +4,10 @@ from sklearn.metrics import accuracy_score, r2_score
 
 from backorder import utils
 from backorder.config import PREDICTION_TYPE, TARGET_COLUMN
-from backorder.entity.artifact_entity import (DataIngestionArtifact,
-                                              DataTransformationArtifact,
-                                              ModelEvaluationArtifact,
-                                              ModelTrainerArtifact)
-from backorder.entity.config_entity import ModelEvaluationConfig
-from backorder.entity.stored_model_entity import StoredModelConfig
+from backorder.entity import (DataIngestionArtifact,
+                              DataTransformationArtifact,
+                              ModelEvaluationArtifact, ModelEvaluationConfig,
+                              ModelTrainerArtifact, StoredModelConfig)
 from backorder.logger import logging
 
 
