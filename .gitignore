@@ -4,6 +4,8 @@ __rough__/
 artifacts/
 .DS_Store
 .vscode/
+stored_models/
+prediction/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
