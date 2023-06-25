@@ -1,9 +1,10 @@
 """ Data Transformation """
 
 import numpy as np
+from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import LabelEncoder, RobustScaler
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler, OrdinalEncoder
 
 from backorder import utils
 from backorder.config import TARGET_COLUMN
@@ -20,18 +21,28 @@ class DataTransformation(DataTransformationConfig):
         logging.info(f"{'>>'*20} Data Transformation {'<<'*20}")
 
     @classmethod
-    def get_transformer_object(cls) -> Pipeline:
-        simple_imputer = SimpleImputer(strategy='constant', fill_value=0)
-        robust_scaler = RobustScaler()
-
-        pipeline = Pipeline(steps=[
-            ('Imputer', simple_imputer),
-            ('RobustScaler', robust_scaler),
+    def get_transformer_object(
+        cls, num_cols: list[str], obj_cols: list[str],
+    ):
+        num_pipe = Pipeline(steps=[
+            ('imputer', SimpleImputer(strategy='mean')),
+            ('scaler', MinMaxScaler()),
         ])
 
-        return pipeline
+        obj_pipe = Pipeline(steps=[
+            ('encoder', OrdinalEncoder()),
+        ])
 
-    def initiate(self) -> DataTransformationArtifact:
+        preprocessor = ColumnTransformer(transformers=[
+            ('num_pipe', num_pipe, num_cols),
+            ('obj_pipe', obj_pipe, obj_cols),
+        ])
+
+        return preprocessor
+
+    def initiate(
+        self, upsample: bool = True,
+    ) -> DataTransformationArtifact:
         # Reading training and testing file
         train_df = utils.read_dataset(self.train_path)
         test_df = utils.read_dataset(self.test_path)
@@ -44,19 +55,14 @@ class DataTransformation(DataTransformationConfig):
         y_train_df = train_df[TARGET_COLUMN]
         y_test_df = test_df[TARGET_COLUMN]
 
-        label_enc = LabelEncoder()
-
         # Transformation on target columns
-        y_train_arr = y_train_df.squeeze()
-        y_test_arr = y_test_df.squeeze()
+        target_enc = LabelEncoder()
+        y_train_arr = target_enc.fit_transform(y_train_df)
+        y_test_arr = target_enc.transform(y_test_df)
 
-        # Transformation on categorical columns
-        for col in X_train_df.columns:
-            if X_test_df[col].dtype == 'O':
-                X_train_df[col] = label_enc.fit_transform(X_train_df[col])
-                X_test_df[col] = label_enc.fit_transform(X_test_df[col])
-
-        trf_pipeline = DataTransformation.get_transformer_object()
+        trf_pipeline = DataTransformation.get_transformer_object(
+            self.num_cols, self.obj_cols,
+        )
         trf_pipeline.fit(X_train_df)
 
         # Transforming input features
@@ -71,7 +77,7 @@ class DataTransformation(DataTransformationConfig):
         utils.dump_array(self.test_npz_path, test_arr)
 
         utils.dump_object(self.transformer_pkl_fp, trf_pipeline)
-        utils.dump_object(self.target_enc_fp, label_enc)
+        utils.dump_object(self.target_enc_fp, target_enc)
 
         artifact = DataTransformationArtifact(
             self.transformer_pkl_fp, self.target_enc_fp,

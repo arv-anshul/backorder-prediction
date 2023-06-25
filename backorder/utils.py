@@ -35,7 +35,7 @@ def wrap_with_custom_exception(cls):
             try:
                 return method(*args, **kwargs)
             except Exception as e:
-                raise CustomException(e, exc_info())
+                raise CustomException(e, exc_info()) from e
         return wrapped
 
     for name, method in vars(cls).items():
@@ -70,15 +70,15 @@ def to_yaml(fp: Path, data: dict):
 
 @exception_wrapper
 def dump_object(fp: Path, obj: object) -> None:
-    logging.info('Enter in the save_object function of utils.')
+    logging.info('Dumping object at %s', fp)
     fp.parent.mkdir(parents=True, exist_ok=True)
     with open(fp, 'wb') as f:
         dill.dump(obj, f)
-    logging.info('Exit from save_object function of utils.')
 
 
 @exception_wrapper
 def load_object(fp: Path):
+    logging.info('Loading object from %s', fp)
     if not fp.exists():
         raise FileNotFoundError(fp)
     with open(fp, 'rb') as f:
@@ -87,11 +87,13 @@ def load_object(fp: Path):
 
 @exception_wrapper
 def dump_array(fp: Path, array):
+    logging.info('Dumping array at %s', fp)
     with open(fp, "wb") as f:
         np.save(f, array)
 
 
 @exception_wrapper
 def load_array(fp: Path):
+    logging.info('Loading array from %s', fp)
     with open(fp, "rb") as f:
         return np.load(f)

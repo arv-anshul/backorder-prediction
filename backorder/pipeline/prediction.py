@@ -25,25 +25,24 @@ class Prediction:
             self.input_data_path.name
         ).with_stem(f'{dt.now():%m%d%Y__%H%M%S}')
 
-    @classmethod
-    def predict_one(cls, one_row_df: DataFrame):
-        df = one_row_df
-
+    @staticmethod
+    def predict_df(df: DataFrame):
         logging.info('Loading pickled transformers to transform dataset.')
-        model, transformer, target_enc = cls.__get_stored_transformers()
+        model, transformer, target_enc = Prediction.get_stored_transformers()
 
-        input_feature_names = list(transformer.feature_names_in_)
-        for i in input_feature_names:
-            if df[i].dtype == 'O':
-                df[i] = target_enc.fit_transform(df[i])
-        input_arr = transformer.transform(df[input_feature_names])
+        input_arr = transformer.transform(df[transformer.feature_names_in_])
         prediction = model.predict(input_arr)
 
-        df['prediction'] = prediction
+        df['prediction'] = target_enc.inverse_transform(prediction.astype(int))
+
+        fp = Path(f'{PREDICTION_DIR}/pred.csv')
+        fp.parent.mkdir(exist_ok=True)
+        df.to_csv(fp, index=False)
+
         return df
 
     @classmethod
-    def __get_stored_transformers(cls):
+    def get_stored_transformers(cls):
         stored_models_config = StoredModelConfig()
 
         transformer_path = stored_models_config.stored_transformer_path
@@ -56,26 +55,14 @@ class Prediction:
 
         return model, transformer, target_enc
 
-    def __clean_df(self, df: DataFrame):
-        """ Custom cleaning for df. """
-        df = df.drop(columns=['sku'])
-
-        return df
-
     def initiate(self):
         logging.info('Reading file for prediction: %s', self.input_data_path)
         df = utils.read_dataset(self.input_data_path)
-        df = self.__clean_df(df)
 
         logging.info('Loading pickled transformers to transform dataset.')
-        model, transformer, target_enc = self.__get_stored_transformers()
+        model, transformer, _ = self.get_stored_transformers()
 
-        # TODO We need to create label encoder object for each categorical variable.
-        input_feature_names = list(transformer.feature_names_in_)
-        for i in input_feature_names:
-            if df[i].dtype == 'O':
-                df[i] = target_enc.fit_transform(df[i])
-        input_arr = transformer.transform(df[input_feature_names])
+        input_arr = transformer.transform(df[transformer.feature_names_in_])
         prediction = model.predict(input_arr)
 
         df['prediction'] = prediction

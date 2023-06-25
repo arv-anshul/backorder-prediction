@@ -29,4 +29,4 @@ class Training:
 
         model_pusher_artifact = ModelPusher(
             transformation_artifact, model_trainer_artifact
-        )
+        ).initiate()
