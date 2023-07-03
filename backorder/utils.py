@@ -14,18 +14,6 @@ from backorder.exception import CustomException
 from backorder.logger import logging
 
 
-def exception_wrapper(func):
-    """
-    Wraps function in a try-except block and raises a custom exception if an exception is caught.
-    """
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except Exception as e:
-            raise CustomException(e, exc_info())
-    return wrapper
-
-
 def wrap_with_custom_exception(cls):
     """
     Wraps all methods of a class in a try-except block and raises a custom exception.
@@ -44,7 +32,6 @@ def wrap_with_custom_exception(cls):
     return cls
 
 
-@exception_wrapper
 def read_dataset(fp: Path) -> DataFrame:
     """ Mostly supports `csv` and `parquet`. """
     # Extract pandas attribute from file extension
@@ -61,14 +48,12 @@ def read_dataset(fp: Path) -> DataFrame:
     return df
 
 
-@exception_wrapper
 def to_yaml(fp: Path, data: dict):
     fp.parent.mkdir(exist_ok=True)
     with open(fp, 'w') as f:
         yaml.dump(data, f)
 
 
-@exception_wrapper
 def dump_object(fp: Path, obj: object) -> None:
     logging.info('Dumping object at %s', fp)
     fp.parent.mkdir(parents=True, exist_ok=True)
@@ -76,7 +61,6 @@ def dump_object(fp: Path, obj: object) -> None:
         dill.dump(obj, f)
 
 
-@exception_wrapper
 def load_object(fp: Path):
     logging.info('Loading object from %s', fp)
     if not fp.exists():
@@ -85,14 +69,12 @@ def load_object(fp: Path):
         return dill.load(f)
 
 
-@exception_wrapper
 def dump_array(fp: Path, array):
     logging.info('Dumping array at %s', fp)
     with open(fp, "wb") as f:
         np.save(f, array)
 
 
-@exception_wrapper
 def load_array(fp: Path):
     logging.info('Loading array from %s', fp)
     with open(fp, "rb") as f:

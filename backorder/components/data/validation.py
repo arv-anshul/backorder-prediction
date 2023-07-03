@@ -89,7 +89,6 @@ class DataValidation(DataValidationConfig):
     def initiate(self) -> DataValidationArtifact:
         # --- --- Base Dataset --- --- #
         logging.info('Reading base DataFrame')
-        # base_df = pd.read_csv(self.base_fp)
         base_df = utils.read_dataset(self.base_data_fp)
 
         logging.info('Drop null values columns from base df')
@@ -98,7 +97,6 @@ class DataValidation(DataValidationConfig):
 
         # --- --- Train dataset --- --- #
         logging.info('Reading train DataFrame')
-        # train_df = pd.read_csv(self.train_path)
         train_df = utils.read_dataset(self.train_path)
 
         logging.info('Drop null values columns from train df')
@@ -107,7 +105,6 @@ class DataValidation(DataValidationConfig):
 
         # --- --- Test Dataset --- --- #
         logging.info('Reading test DataFrame')
-        # test_df = pd.read_csv(self.test_path)
         test_df = utils.read_dataset(self.test_path)
 
         logging.info('Drop null values columns from test df')

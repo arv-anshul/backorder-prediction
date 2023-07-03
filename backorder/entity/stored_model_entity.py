@@ -2,12 +2,10 @@
 
 from pathlib import Path
 
-from backorder import utils
 from backorder.config import STORED_MODEL_PATH
 from backorder.logger import logging
 
 
-@utils.wrap_with_custom_exception
 class StoredModelConfig:
     def __init__(self) -> None:
         self.model_registry = STORED_MODEL_PATH

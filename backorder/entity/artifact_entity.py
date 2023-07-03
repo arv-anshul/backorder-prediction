@@ -39,6 +39,5 @@ class ModelEvaluationArtifact:
 
 @dataclass
 class ModelPusherArtifact:
-    # pusher_model_dir: Path
     self_dir: Path
     root_saved_model_dir: Path

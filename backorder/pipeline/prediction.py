@@ -21,8 +21,7 @@ class Prediction:
         self.input_data_path = input_fp
         PREDICTION_DIR.mkdir(exist_ok=True)
         self.predicted_csv_fp = (
-            PREDICTION_DIR /
-            self.input_data_path.name
+            PREDICTION_DIR / self.input_data_path.name
         ).with_stem(f'{dt.now():%m%d%Y__%H%M%S}')
 
     @staticmethod

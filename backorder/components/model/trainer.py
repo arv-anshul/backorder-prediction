@@ -1,8 +1,7 @@
 """ Train models and store it. """
 
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, r2_score
-from sklearn.svm import SVR
+from sklearn.metrics import accuracy_score
 
 from backorder import utils
 from backorder.config import PREDICTION_TYPE
@@ -37,26 +36,12 @@ class ModelTrainer(ModelTrainerConfig):
     def _fine_tune(self):
         ...
 
-    def _train_model(self, X, y):
-        if self.prediction_type == 'regression':
-            regression = SVR()
-            regression.fit(X, y)
-            return regression
-        else:
-            classification = RandomForestClassifier()
-            classification.fit(X, y)
-            return classification
-
     def _evaluate(self, model, X_train, X_test, y_train, y_test):
         y_hat_train = model.predict(X_train)
         y_hat_test = model.predict(X_test)
 
-        if self.prediction_type == 'regression':
-            train_score = r2_score(y_train, y_hat_train)
-            test_score = r2_score(y_test, y_hat_test)
-        else:
-            train_score = accuracy_score(y_train, y_hat_train)
-            test_score = accuracy_score(y_test, y_hat_test)
+        train_score = accuracy_score(y_train, y_hat_train)
+        test_score = accuracy_score(y_test, y_hat_test)
 
         logging.info('Train score: %s', train_score)
         logging.info('Tests score: %s', test_score)
@@ -84,7 +69,8 @@ class ModelTrainer(ModelTrainerConfig):
         X_train, X_test, y_train, y_test = self._get_train_test_data()
 
         logging.info('Train the model')
-        model = self._train_model(X_train, y_train)
+        model = RandomForestClassifier()
+        model.fit(X_train, y_train)
 
         train_score, test_score = self._evaluate(
             model, X_train, X_test, y_train, y_test

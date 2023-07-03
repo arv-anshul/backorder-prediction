@@ -25,10 +25,6 @@ class DataIngestionConfig(TrainingPipelineConfig):
         self.test_size = 0.2
         self.__create_all_dirs()
 
-    def to_dict(self) -> dict:
-        """ Convert data into dict """
-        return self.__dict__
-
     def __create_all_dirs(self):
         self.dir.mkdir(parents=True, exist_ok=True)
         self.feature_store_fp.parent.mkdir(exist_ok=True)
@@ -88,9 +84,8 @@ class ModelTrainerConfig(TrainingPipelineConfig):
         self.dir.mkdir(exist_ok=True)
 
 
-class ModelEvaluationConfig(TrainingPipelineConfig):
+class ModelEvaluationConfig:
     def __init__(self):
-        super().__init__()
         self.change_threshold = 0.01
 
 
