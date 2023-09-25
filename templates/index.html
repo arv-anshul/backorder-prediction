@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p>
+<h2 class="text-center">
+    My Github Profile <a href="https://github.com/arv-anshul" class="fs-2 text-primary">link</a>.
+</h2>
+</p>
+
+<p>
+<h2 class="text-center">
+    Backorder prediction repository <a href="https://github.com/arv-anshul/ineuron-backorder-prediction"
+        class="fs-2 text-primary">link</a>.
+</h2>
+</p>
+
+<p>
+    <div class="text-center">
+        <form action="/train_model" method="post">
+            <button class="btn btn-danger" type="submit">Train Model</button>
+        </form>
+    </div>
+</p>
+{% endblock %}

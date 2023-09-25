@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Batch Prediction -->
+<div class="container">
+  <form action="/batch_prediction" method="POST" enctype="multipart/form-data">
+    <fieldset class="border border-danger rounded m-3 p-3">
+      <legend style="width: auto !important;">Upload CSV File</legend>
+      <div class="mb-3">
+        <input class="form-control" type="file" name="file" id="file" accept=".csv" required>
+      </div>
+      <button class="btn btn-primary" type="submit">Upload & Predict</button>
+    </fieldset>
+  </form>
+</div>
+
+<div class="container">
+  <form action="/one_prediction" method="POST">
+    <fieldset class="border border-success border-3 rounded m-3 p-3">
+      <legend style="width: auto;">Inputs for Prediction</legend>
+
+      {% for col in num_cols %}
+      <div class="mb-3">
+        <label for="{{ col }}" class="form-label">{{ col|replace("_", " ")|title }}</label>
+        <input class="form-control" type="number" name="{{ col }}" id="{{ col }}" required />
+      </div>
+      {% endfor %}
+
+      {% for col in cat_cols %}
+      <div class="mb-3">
+        <label for="{{ col }}" class="form-label">{{ col|replace("_", " ")|title }}</label>
+        <select class="form-control" name="{{ col }}" id="{{ col }}" required>
+          <option value="Yes" selected>Yes</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+      {% endfor %}
+
+      <button class="btn btn-primary" type="submit">Predict</button>
+    </fieldset>
+  </form>
+</div>
+{% endblock %}
