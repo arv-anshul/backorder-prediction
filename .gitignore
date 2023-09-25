@@ -1,11 +1,26 @@
-# Custom ignore
-__rough__*.*
-__rough__/
-artifacts/
-.DS_Store
+# Ignore virtual environments
+.venv/
+
+# Ignore environment variables
+.env
+
+# Ignore files
+*__rough__*.*
+
+# Ignore directories
 .vscode/
-stored_models/
+.DS_Store
+__pycache__/
+.ipynb_checkpoints/
+__rough__/
+
+# Custom project files and folders
+logs/
+data/
+artifacts/
 prediction/
+stored_models/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
