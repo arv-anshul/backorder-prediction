@@ -8,40 +8,48 @@ from sklearn.preprocessing import LabelEncoder, MinMaxScaler, OrdinalEncoder
 
 from backorder import utils
 from backorder.config import TARGET_COLUMN
-from backorder.entity import (DataTransformationArtifact,
-                              DataTransformationConfig)
+from backorder.entity import DataTransformationArtifact, DataTransformationConfig
 from backorder.logger import logging
 
 
 @utils.wrap_with_custom_exception
 class DataTransformation(DataTransformationConfig):
     def __init__(self):
-        """ To initiate transformation process with train and test dataset. """
+        """To initiate transformation process with train and test dataset."""
         super().__init__()
         logging.info(f"{'>>'*20} Data Transformation {'<<'*20}")
 
     @classmethod
     def get_transformer_object(
-        cls, num_cols: list[str], obj_cols: list[str],
+        cls,
+        num_cols: list[str],
+        obj_cols: list[str],
     ):
-        num_pipe = Pipeline(steps=[
-            ('imputer', SimpleImputer(strategy='mean')),
-            ('scaler', MinMaxScaler()),
-        ])
+        num_pipe = Pipeline(
+            steps=[
+                ('imputer', SimpleImputer(strategy='mean')),
+                ('scaler', MinMaxScaler()),
+            ]
+        )
 
-        obj_pipe = Pipeline(steps=[
-            ('encoder', OrdinalEncoder()),
-        ])
+        obj_pipe = Pipeline(
+            steps=[
+                ('encoder', OrdinalEncoder()),
+            ]
+        )
 
-        preprocessor = ColumnTransformer(transformers=[
-            ('num_pipe', num_pipe, num_cols),
-            ('obj_pipe', obj_pipe, obj_cols),
-        ])
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ('num_pipe', num_pipe, num_cols),
+                ('obj_pipe', obj_pipe, obj_cols),
+            ]
+        )
 
         return preprocessor
 
     def initiate(
-        self, upsample: bool = True,
+        self,
+        upsample: bool = True,
     ) -> DataTransformationArtifact:
         # Reading training and testing file
         train_df = utils.read_dataset(self.train_path)
@@ -60,9 +68,7 @@ class DataTransformation(DataTransformationConfig):
         y_train_arr = target_enc.fit_transform(y_train_df)
         y_test_arr = target_enc.transform(y_test_df)
 
-        trf_pipeline = DataTransformation.get_transformer_object(
-            self.num_cols, self.obj_cols,
-        )
+        trf_pipeline = DataTransformation.get_transformer_object(self.num_cols, self.cat_cols)
         trf_pipeline.fit(X_train_df)
 
         # Transforming input features
@@ -80,8 +86,7 @@ class DataTransformation(DataTransformationConfig):
         utils.dump_object(self.target_enc_fp, target_enc)
 
         artifact = DataTransformationArtifact(
-            self.transformer_pkl_fp, self.target_enc_fp,
-            self.train_npz_path, self.test_npz_path,
+            self.transformer_pkl_fp, self.target_enc_fp, self.train_npz_path, self.test_npz_path
         )
 
         logging.info('Data transformation object %s', artifact)

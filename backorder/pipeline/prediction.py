@@ -1,6 +1,5 @@
 """ Predict the input file and store. """
 
-from datetime import datetime as dt
 from pathlib import Path
 
 from pandas import DataFrame
@@ -14,25 +13,22 @@ PREDICTION_DIR = Path('prediction')
 
 @utils.wrap_with_custom_exception
 class Prediction:
-    def __init__(self, input_fp: Path) -> None:
-        """ Prediction using transformed model. """
+    def __init__(self) -> None:
+        """Prediction using transformed model."""
         logging.info(f"{'>>'*20} Prediction {'<<'*20}")
 
-        self.input_data_path = input_fp
         PREDICTION_DIR.mkdir(exist_ok=True)
-        self.predicted_csv_fp = (
-            PREDICTION_DIR / self.input_data_path.name
-        ).with_stem(f'{dt.now():%m%d%Y__%H%M%S}')
+        self.predicted_csv_fp = PREDICTION_DIR / 'prediction.csv'
 
     @staticmethod
-    def predict_df(df: DataFrame):
+    def one_prediction(df: DataFrame):
         logging.info('Loading pickled transformers to transform dataset.')
         model, transformer, target_enc = Prediction.get_stored_transformers()
 
         input_arr = transformer.transform(df[transformer.feature_names_in_])
         prediction = model.predict(input_arr)
 
-        df['prediction'] = target_enc.inverse_transform(prediction.astype(int))
+        df['backorder_prediction'] = target_enc.inverse_transform(prediction.astype(int))
 
         fp = Path(f'{PREDICTION_DIR}/pred.csv')
         fp.parent.mkdir(exist_ok=True)
@@ -40,8 +36,8 @@ class Prediction:
 
         return df
 
-    @classmethod
-    def get_stored_transformers(cls):
+    @staticmethod
+    def get_stored_transformers():
         stored_models_config = StoredModelConfig()
 
         transformer_path = stored_models_config.stored_transformer_path
@@ -54,16 +50,21 @@ class Prediction:
 
         return model, transformer, target_enc
 
-    def initiate(self):
-        logging.info('Reading file for prediction: %s', self.input_data_path)
-        df = utils.read_dataset(self.input_data_path)
+    def batch_prediction(self, df: DataFrame = ..., csv_fp: Path = ...) -> Path:
+        if isinstance(csv_fp, Path) and csv_fp.suffix == '.csv':
+            logging.info('Reading file for prediction: %s', csv_fp)
+            df = utils.read_dataset(csv_fp)
+        elif isinstance(df, DataFrame):
+            ...
+        else:
+            raise ValueError('Pass either df or csv_path.')
 
         logging.info('Loading pickled transformers to transform dataset.')
-        model, transformer, _ = self.get_stored_transformers()
+        model, transformer, target_enc = Prediction.get_stored_transformers()
 
         input_arr = transformer.transform(df[transformer.feature_names_in_])
         prediction = model.predict(input_arr)
 
-        df['prediction'] = prediction
+        df['backorder_prediction'] = target_enc.inverse_transform(prediction.astype(int))
         df.to_csv(self.predicted_csv_fp, index=False, header=True)
         return self.predicted_csv_fp

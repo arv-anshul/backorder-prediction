@@ -17,12 +17,12 @@ from backorder.logger import logging
 @utils.wrap_with_custom_exception
 class DataIngestion(DataIngestionConfig):
     def __init__(self):
-        """ Divides and store the main data into train, test and validation data. """
+        """Divides and store the main data into train, test and validation data."""
         super().__init__()
         logging.info(f"{'>>'*10} Data Ingestion {'<<'*10}")
 
     def _import_data(self, fp: Path | None = None) -> DataFrame:
-        """ Import the data from the provided path. """
+        """Import the data from the provided path."""
         import_path = self.base_data_fp if fp is None else fp
 
         log_msg = 'Importing main data from "%s"'
@@ -32,7 +32,7 @@ class DataIngestion(DataIngestionConfig):
         return df
 
     def _clean_df(self, df: DataFrame) -> DataFrame:
-        """ Custom cleaning of the df if requires. """
+        """Custom cleaning of the df if requires."""
         df = df[:-1]
 
         # Drop columns
@@ -41,35 +41,32 @@ class DataIngestion(DataIngestionConfig):
         return df
 
     def _df_to_parquet(self, df: DataFrame, fp: Path) -> None:
-        """ Convert DataFrame to parquet format and store it. """
+        """Convert DataFrame to parquet format and store it."""
         # Change different file extension to parquet
         fp = fp.with_suffix('.parquet')
 
         logging.info('Saving DataFrame at "%s"', fp)
         df.to_parquet(fp, index=False)
 
-    def upsample_data(
-        self, X: DataFrame, y: Series
-    ) -> Tuple[DataFrame, Series]:
+    def upsample_data(self, X: DataFrame, y: Series) -> Tuple[DataFrame, Series]:
         X_majority, X_minority = X[y == 'No'], X[y == 'Yes']
         y_majority, y_minority = y[y == 'No'], y[y == 'Yes']
 
-        X_upsampled, y_upsampled = resample(X_minority, y_minority,
-                                            replace=True,
-                                            n_samples=len(X_majority))
+        X_upsampled, y_upsampled = resample(
+            X_minority, y_minority, replace=True, n_samples=len(X_majority)
+        )
 
         X_upsampled = np.concatenate((X_majority, X_upsampled))
         y_upsampled = np.concatenate((y_majority, y_upsampled))
 
-        return (
-            DataFrame(X_upsampled, columns=X.columns),
-            Series(y_upsampled, name=TARGET_COLUMN)
-        )
+        return (DataFrame(X_upsampled, columns=X.columns), Series(y_upsampled, name=TARGET_COLUMN))
 
     def initiate(
-        self, main_data_fp: Path | None = None, upsample: bool = True,
+        self,
+        main_data_fp: Path | None = None,
+        upsample: bool = True,
     ) -> DataIngestionArtifact:
-        """ Initiate the Data Ingestion process. """
+        """Initiate the Data Ingestion process."""
         df = self._import_data(main_data_fp)
         logging.info('Shape of imported raw data %s', df.shape)
         df = self._clean_df(df)
@@ -93,8 +90,6 @@ class DataIngestion(DataIngestionConfig):
         self._df_to_parquet(test_df, self.test_path)
 
         # Prepare artifact
-        artifact = DataIngestionArtifact(
-            self.feature_store_fp, self.train_path, self.test_path
-        )
+        artifact = DataIngestionArtifact(self.feature_store_fp, self.train_path, self.test_path)
         logging.info(f"Data ingestion artifact: {artifact}")
         return artifact
